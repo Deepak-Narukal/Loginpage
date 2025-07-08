@@ -1,14 +1,17 @@
 require("dotenv").config()
 const express = require("express")
+const cookieparsher = require("cookie-parser")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const { data } = require("./schema")
 const app = express()
 app.use(express.json())
+app.use(cookieparsher())
+
 
 const Registration = async (req, res) => {
      try {
-          const { password, username, name, email } = req.body
+          const { username, name, email, password } = req.body
           const salt = await bcrypt.genSalt(10)
           const hash = await bcrypt.hash(password, salt)
           const credentials = await data.create({
@@ -18,9 +21,9 @@ const Registration = async (req, res) => {
                password: hash
           })
           if (credentials) {
-               return res.redirect("/login")
+               return res.status(200).json({ credentials })
           } else {
-               return res.alert("Something went Wrong!!!")
+               return res.send("Something went Wrong!!!")
           }
 
 
@@ -36,12 +39,10 @@ const Login = async (req, res) => {
           const findUser = await data.findOne({ username })
           if (findUser) {
                const ismatch = await bcrypt.compare(password, findUser.password)
-               console.log(ismatch)
+               if (!ismatch) return res.status(500).json({ Message: "Something Went Wrong!!" })
                const JWTtoken = await jwt.sign(username, process.env.SECRETKEY)
                await res.cookie("Token", JWTtoken)
-               console.log(JWTtoken)
-
-               await res.redirect("/Dashboard")
+               res.status(200).json({ findUser })
           } else {
                throw new Error("Something Went Wrong!!!");
 
@@ -55,6 +56,20 @@ const Login = async (req, res) => {
      }
 }
 
+const AuthVerify = async (req, res) => {
+     try {
+          const cookie = req.cookies.Token
+          if (!cookie) {
+               return res.status(401).json({ message: "No token provided" });
+          }
+          const verify = await jwt.verify(cookie, process.env.SECRETKEY)
+          if (verify) return res.status(200).json({ message: "You are Credible", verify })
+     } catch (error) {
+          res.status(500).json({ error: error.messsage })
+     }
+
+}
+
 const Logout = async (req, res) => {
      try {
           res.clearcookie(Token)
@@ -65,5 +80,5 @@ const Logout = async (req, res) => {
           })
      }
 }
-module.exports = { Registration, Login, Logout }
+module.exports = { Registration, Login, Logout, AuthVerify }
 
