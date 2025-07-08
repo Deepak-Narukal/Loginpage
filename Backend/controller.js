@@ -3,7 +3,6 @@ const express = require("express")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const { data } = require("./schema")
-const cookieParser = require("cookie-parser")
 const app = express()
 app.use(express.json())
 
