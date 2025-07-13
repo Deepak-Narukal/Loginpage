@@ -3,7 +3,7 @@ const express = require("express")
 const cookieParser = require("cookie-parser")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
-const { data, post } = require("./schema")
+const { data, postModel } = require("./schema")
 const app = express()
 app.use(express.json())
 app.use(cookieParser())
@@ -35,18 +35,20 @@ const Registration = async (req, res) => {
 const SubmitPost = async (req, res) => {
      try {
           const username = "Anirudh"
-          const userDeatail = await data.findOne({ username }).populate()
+          const userDeatail = await data.findOne({ username }).populate("post")
           if (!userDeatail) {
                res.status(404).json({ message: "User Not Found!!!" })
                console.log("userDeatail not available")
           }
           console.log(userDeatail)
           const { content } = req.body
-          const mainpost = await post.create({
+          const mainpost = await postModel.create({
                user: userDeatail._id,
                content
           })
-          userDeatail.post.push(mainpost._id)
+          await userDeatail.post.push(mainpost._id)
+          console.log(mainpost._id)
+
           res.status(200).json({ message: "sucess", mainpost })
      } catch (error) {
           res.status(500).json({ err: error.message })
@@ -56,6 +58,7 @@ const SendPost = async (req, res) => {
      try {
           const user = await data.findOne({ username: "Anirudh" })
           if (!user) return res.status(404).json({ message: "USer not Found" })
+          res.status(200).json({ user: user })
      } catch (error) {
           res.status(500).json({ error })
      }
