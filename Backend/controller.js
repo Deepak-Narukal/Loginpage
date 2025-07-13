@@ -1,12 +1,12 @@
 require("dotenv").config()
 const express = require("express")
-const cookieparsher = require("cookie-parser")
+const cookieParser = require("cookie-parser")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
-const { data } = require("./schema")
+const { data, post } = require("./schema")
 const app = express()
 app.use(express.json())
-app.use(cookieparsher())
+app.use(cookieParser())
 
 
 const Registration = async (req, res) => {
@@ -32,7 +32,34 @@ const Registration = async (req, res) => {
           res.status(500).json({ message: error.message })
      }
 }
-
+const SubmitPost = async (req, res) => {
+     try {
+          const username = "Anirudh"
+          const userDeatail = await data.findOne({ username }).populate()
+          if (!userDeatail) {
+               res.status(404).json({ message: "User Not Found!!!" })
+               console.log("userDeatail not available")
+          }
+          console.log(userDeatail)
+          const { content } = req.body
+          const mainpost = await post.create({
+               user: userDeatail._id,
+               content
+          })
+          userDeatail.post.push(mainpost._id)
+          res.status(200).json({ message: "sucess", mainpost })
+     } catch (error) {
+          res.status(500).json({ err: error.message })
+     }
+}
+const SendPost = async (req, res) => {
+     try {
+          const user = await data.findOne({ username: "Anirudh" })
+          if (!user) return res.status(404).json({ message: "USer not Found" })
+     } catch (error) {
+          res.status(500).json({ error })
+     }
+}
 const Login = async (req, res) => {
      try {
           const { username, password } = req.body
@@ -40,8 +67,8 @@ const Login = async (req, res) => {
           if (findUser) {
                const ismatch = await bcrypt.compare(password, findUser.password)
                if (!ismatch) return res.status(500).json({ Message: "Something Went Wrong!!" })
-               const JWTtoken = await jwt.sign(username, process.env.SECRETKEY)
-               await res.cookie("Token", JWTtoken)
+               const JWTtoken = await jwt.sign({ username }, process.env.SECRETKEY)
+               res.cookie("token", JWTtoken)
                res.status(200).json({ findUser })
           } else {
                throw new Error("Something Went Wrong!!!");
@@ -55,30 +82,35 @@ const Login = async (req, res) => {
           })
      }
 }
-
-const AuthVerify = async (req, res) => {
+const AuthVerify = async (req, res, next) => {
      try {
-          const cookie = req.cookies.Token
-          if (!cookie) {
+          const token = req.cookies.token;
+          console.log("Token from cookie:", token);
+          console.log("Cookies received:", req.cookies) // Add this
+
+
+          if (!token) {
                return res.status(401).json({ message: "No token provided" });
           }
-          const verify = await jwt.verify(cookie, process.env.SECRETKEY)
-          if (verify) return res.status(200).json({ message: "You are Credible", verify })
+
+          const verified = jwt.verify(token, process.env.SECRETKEY);
+          console.log("Verified token payload:", verified);
+
+          req.user = verified; // Attach user data to request for further use
+
+          next();
      } catch (error) {
-          res.status(500).json({ error: error.messsage })
+          res.status(500).json({ error: error.message });
      }
-
-}
-
+};
 const Logout = async (req, res) => {
      try {
-          res.clearcookie(Token)
-          res.redirect("/login")
+          res.clearcookie("token")
      } catch (error) {
           res.status(500).json({
                message: error.message
           })
      }
 }
-module.exports = { Registration, Login, Logout, AuthVerify }
+module.exports = { Registration, Login, Logout, AuthVerify, SubmitPost, SendPost }
 

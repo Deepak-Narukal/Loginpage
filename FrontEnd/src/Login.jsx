@@ -26,8 +26,8 @@ const Login = () => {
         alert("Something Went Wrong!!!😭");
       }
     } catch (error) {
+      console.error(error.message);
       alert("Something Went Wrong!!");
-
     }
   };
 

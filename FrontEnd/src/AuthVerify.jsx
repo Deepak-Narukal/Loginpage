@@ -1,20 +1,23 @@
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import axios from "axios";
+// import { useEffect, useState } from "react";
+// import { Navigate } from "react-router-dom";
+// import axios from "axios";
 
-export const RenderChild = ({ children }) => {
-  const [IsAuth, setIsAuth] = useState(null);
+// export const RenderChild = ({ children }) => {
+//   const [IsAuth, setIsAuth] = useState();
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/auth", { withCredentials: true })
-      .then(() => setIsAuth(true))
-      .catch(() => setIsAuth(false));
-  }, []);
+//   useEffect(() => {
+//     axios
+//       .get("http://localhost:3000/auth", { withCredentials: true })
+//       .then(() => setIsAuth(true))
+//       .catch((err) => {
+//         console.error(err);
+//         setIsAuth(false);
+//       });
+//   }, []);
 
-  if (IsAuth === null) {
-    return null; // or a loading spinner
-  }
+//   if (IsAuth === undefined) {
+//     return <div>Loading...</div>; // or return null for no UI
+//   }
 
-  return IsAuth ? children : <Navigate to="/login" replace />;
-};
+//   return IsAuth ? children : <Navigate to="/" replace />;
+// };
