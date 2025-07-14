@@ -34,19 +34,22 @@ const Registration = async (req, res) => {
 }
 const SubmitPost = async (req, res) => {
      try {
-          const username = "Anirudh"
-          const userDeatail = await data.findOne({ username }).populate("post")
+          const username = "LalitSSC"
+          // const userDeatail = await data.findOne({ username }).populate("post")
+          const userDeatail = await data
+               .findOne({ username: "LalitSSC" }).populate("post")
+
           if (!userDeatail) {
                res.status(404).json({ message: "User Not Found!!!" })
                console.log("userDeatail not available")
           }
-          console.log(userDeatail)
           const { content } = req.body
           const mainpost = await postModel.create({
                user: userDeatail._id,
-               content
+               content: content
           })
           await userDeatail.post.push(mainpost._id)
+          await userDeatail.save()
           console.log(mainpost._id)
 
           res.status(200).json({ message: "sucess", mainpost })
@@ -56,7 +59,7 @@ const SubmitPost = async (req, res) => {
 }
 const SendPost = async (req, res) => {
      try {
-          const user = await data.findOne({ username: "Anirudh" })
+          const user = await data.findOne({ username: "LalitSSC" })
           if (!user) return res.status(404).json({ message: "USer not Found" })
           res.status(200).json({ user: user })
      } catch (error) {

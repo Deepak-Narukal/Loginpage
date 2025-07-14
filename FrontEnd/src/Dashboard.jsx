@@ -4,30 +4,45 @@ import axios from "axios";
 
 const Post = () => {
   const [show, setshow] = useState({ content: "" });
+  const [data, setdata] = useState();
 
   const Inserdata = (e) => {
     const { name, value } = e.target;
     setshow({ ...show, [name]: value });
-    console.log(show);
   };
-  const postApi = async () => {
+  const postApi = async (e) => {
+    e.preventDefault();
     const goodjob = await axios.post("http://localhost:3000/postcreate", {
       content: show.content,
     });
     if (!goodjob) return console.log("Not done properly", goodjob);
   };
   useEffect(() => {
-    const posts = axios
-      .get("http://localhost:3000/sendpost")
-      .then(() => console.log(posts))
-      .catch((err) => console.error(err));
-    if (!posts) return alert("there is no Data present.");
+    const putData = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/sendpost");
+
+        if (!response.data) return alert("There is no Data present.");
+        setdata(response.data); // ✅ Only the actual data
+      } catch (error) {
+        console.error("why", error.message);
+      }
+    };
+    putData();
   }, []);
+  console.log(data);
 
   return (
     <>
       <div className="w-full min-h-screen p-[1rem] bg-zinc-700 ">
-        <h1 className="font-bold text-white text-xl">Hello👋 Anmol</h1>
+        <h1 className="font-bold text-white text-xl">
+          Hello👋
+          {data ? (
+            <p className="text-white">{data.user.name}</p>
+          ) : (
+            <p className="text-white">Loading...</p>
+          )}
+        </h1>
         <p className="text-gray-500 font-bold text-lg">
           You can create a new post.:
         </p>
@@ -46,21 +61,42 @@ const Post = () => {
             className="border-blue-500 rounded pr-[8px] pl-[8px] bg-blue-500 text-white mt-[2px] block hover:cursor-pointer"
           />
         </form>
-        <div className="flex gap-10 flex-wrap">
-          <div className="border text-white rounded p-[10px] mt-6 mb-6 max-w-[30rem] min-h-[10rem] break-all text-pretty">
-            <p className="text-white">@Anmol</p>
-            <h3 className="text-gray-500">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis
-              sit accusantium perferendis quibusdam error porro, autem quidem
-              voluptatem modi eos laborum a voluptas quisquam iusto sed mollitia
-              molestias ratione. Quasi?
-            </h3>
-            <div className="flex gap-5">
-              <p className="hover:cursor-pointer">Like</p>
-              <p className="text-gray-300 hover:cursor-pointer">Edit</p>
+        {data ? (
+          <div className="flex gap-10 flex-wrap">
+            <div className="border text-white rounded p-[10px] mt-6 mb-6 max-w-[30rem] min-w-[30rem] min-h-[10rem] break-all text-pretty">
+              <p className="text-white">
+                {data ? (
+                  <p className="text-white">@{data.user.username}</p>
+                ) : (
+                  <p className="text-white">Loading...</p>
+                )}
+              </p>
+              <h3 className="text-gray-500">
+                {data?.post?.length > 0 ? (
+                  data.post.map((post, idx) => (
+                    <div
+                      key={idx}
+                      className="border text-white rounded p-[10px] mt-6 mb-6 max-w-[30rem] min-w-[30rem] min-h-[10rem] break-all text-pretty"
+                    >
+                      <h3 className="text-gray-400">{post[0]}</h3>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-white">No posts yet.</p>
+                )}
+                {/* {data.map((post, key) => {
+                post.content;
+              })} */}
+              </h3>
+              <div className="flex gap-5">
+                <p className="hover:cursor-pointer">Like</p>
+                <p className="text-gray-300 hover:cursor-pointer">Edit</p>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <p className="text-white">No posts yet.</p>
+        )}
       </div>
     </>
   );
