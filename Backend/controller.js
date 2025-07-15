@@ -35,9 +35,14 @@ const Registration = async (req, res) => {
 const SubmitPost = async (req, res) => {
      try {
           const username = "LalitSSC"
-          // const userDeatail = await data.findOne({ username }).populate("post")
-          const userDeatail = await data
-               .findOne({ username: "LalitSSC" }).populate("post")
+          const userDeatail = await data.findOne({ username }).populate("post")
+          console.log("First post content:", userDeatail.post[0].content);
+          console.log("All posts:");
+          userDeatail.post.forEach((post, index) => {
+               console.log(`Post ${index + 1}:`, post.content);
+          });
+          // const userDeatail = await data
+          //      .findOne({ username: "LalitSSC" }).populate("post", "content")
 
           if (!userDeatail) {
                res.status(404).json({ message: "User Not Found!!!" })
@@ -48,8 +53,11 @@ const SubmitPost = async (req, res) => {
                user: userDeatail._id,
                content: content
           })
+
+
           await userDeatail.post.push(mainpost._id)
           await userDeatail.save()
+          await mainpost.save()
           console.log(mainpost._id)
 
           res.status(200).json({ message: "sucess", mainpost })
