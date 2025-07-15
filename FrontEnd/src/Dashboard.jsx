@@ -1,4 +1,5 @@
-/* eslint-disable no-unused-vars */
+// /* eslint-disable no-unused-vars */
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -71,23 +72,11 @@ const Post = () => {
                   <p className="text-white">Loading...</p>
                 )}
               </p>
-              <h3 className="text-gray-500">
-                {data?.post?.length > 0 ? (
-                  data.post.map((post, idx) => (
-                    <div
-                      key={idx}
-                      className="border text-white rounded p-[10px] mt-6 mb-6 max-w-[30rem] min-w-[30rem] min-h-[10rem] break-all text-pretty"
-                    >
-                      <h3 className="text-gray-400">{post[0]}</h3>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-white">No posts yet.</p>
-                )}
-                {/* {data.map((post, key) => {
-                post.content;
-              })} */}
-              </h3>
+
+              {data.user.post?.map((post, index) => {
+                <p key={index}>{post.content}</p>;
+              })}
+
               <div className="flex gap-5">
                 <p className="hover:cursor-pointer">Like</p>
                 <p className="text-gray-300 hover:cursor-pointer">Edit</p>
