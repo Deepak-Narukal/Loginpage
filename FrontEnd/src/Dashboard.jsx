@@ -65,17 +65,15 @@ const Post = () => {
         {data ? (
           <div className="flex gap-10 flex-wrap">
             <div className="border text-white rounded p-[10px] mt-6 mb-6 max-w-[30rem] min-w-[30rem] min-h-[10rem] break-all text-pretty">
-              <p className="text-white">
+              <span className="text-white">
                 {data ? (
                   <p className="text-white">@{data.user.username}</p>
                 ) : (
                   <p className="text-white">Loading...</p>
                 )}
-              </p>
+              </span>
 
-              {data.user.post?.map((post, index) => {
-                <p key={index}>{post.content}</p>;
-              })}
+              {data?.user.post?.map((post) => post.content)}
 
               <div className="flex gap-5">
                 <p className="hover:cursor-pointer">Like</p>
