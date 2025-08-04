@@ -3,9 +3,9 @@ const { Login, Registration, Logout, AuthVerify, SubmitPost, SendPost } = requir
 const router = express.Router()
 
 router.get("/auth", AuthVerify)
-router.get("/sendpost", SendPost)
+router.get("/sendpost", AuthVerify, SendPost)
 router.post("/registration", Registration)
-router.post("/postcreate", SubmitPost)
+router.post("/postcreate", AuthVerify, SubmitPost)
 router.post("/login", Login)
 router.post("/logout", Logout)
 
