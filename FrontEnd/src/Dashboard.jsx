@@ -11,11 +11,16 @@ const Post = () => {
     const { name, value } = e.target;
     setshow({ ...show, [name]: value });
   };
+
   const postApi = async (e) => {
     e.preventDefault();
-    const goodjob = await axios.post("http://localhost:3000/postcreate", {
-      content: show.content,
-    });
+    const goodjob = await axios.post(
+      "http://localhost:3000/postcreate",
+      {
+        content: show.content,
+      },
+      { withCredentials: true }
+    );
     if (!goodjob) return console.log("Not done properly", goodjob);
   };
   useEffect(() => {

@@ -1,7 +1,7 @@
 import Dashboard from "./Dashboard";
 import Login from "./Login";
 import Registration from "./Registration";
-// import { RenderChild } from "./AuthVerify";
+import { RenderChild } from "./AuthVerify";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 const App = () => {
@@ -14,9 +14,9 @@ const App = () => {
           <Route
             path="/dashboard"
             element={
-              // <RenderChild>
-              <Dashboard />
-              // </RenderChild>
+              <RenderChild>
+                <Dashboard />
+              </RenderChild>
             }
           />
         </Routes>
