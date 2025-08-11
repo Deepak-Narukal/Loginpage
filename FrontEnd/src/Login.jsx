@@ -16,10 +16,14 @@ const Login = () => {
   const Authenticate = async (e) => {
     e.preventDefault();
     try {
-      const data = await axios.post("http://localhost:3000/login", {
-        username: Approve.username,
-        password: Approve.password,
-      });
+      const data = await axios.post(
+        "http://localhost:3000/login",
+        {
+          username: Approve.username,
+          password: Approve.password,
+        },
+        { withCredentials: true }
+      );
       if (data) {
         navigate("/dashboard");
       } else {

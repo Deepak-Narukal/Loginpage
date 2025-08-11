@@ -7,7 +7,7 @@ export const RenderChild = ({ children }) => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/auth", { withCredentials: true })
+      .get("http://localhost:3000/sendpost", { withCredentials: true })
       .then(() => setIsAuth(true))
       .catch((err) => {
         console.error(err);

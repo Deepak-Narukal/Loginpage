@@ -6,6 +6,11 @@ import axios from "axios";
 const Post = () => {
   const [show, setshow] = useState({ content: "" });
   const [data, setdata] = useState();
+  const [rerender, setrerender] = useState();
+
+  const Rerendered = (e) => {
+    setrerender(e);
+  };
 
   const Inserdata = (e) => {
     const { name, value } = e.target;
@@ -22,11 +27,15 @@ const Post = () => {
       { withCredentials: true }
     );
     if (!goodjob) return console.log("Not done properly", goodjob);
+    setshow({ content: "" });
+    Rerendered();
   };
   useEffect(() => {
     const putData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/sendpost");
+        const response = await axios.get("http://localhost:3000/sendpost", {
+          withCredentials: true,
+        });
 
         if (!response.data) return alert("There is no Data present.");
         setdata(response.data); // ✅ Only the actual data
@@ -35,12 +44,28 @@ const Post = () => {
       }
     };
     putData();
-  }, []);
-  console.log(data);
+  }, [rerender]);
+
+  const Logout = async () => {
+    try {
+      await axios.post("http://localhost:3000/logout", {
+        withCredentials: true,
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
   return (
     <>
-      <div className="w-full min-h-screen p-[1rem] bg-zinc-700 ">
+      <div className="w-full min-h-screen p-[1rem] bg-zinc-700">
+        <button
+          type="button"
+          className="flex float-right border-red-500 rounded pr-[8px] pl-[8px] bg-red-500 font-bold font-mono hover:cursor-pointer "
+          onClick={Logout}
+        >
+          Logout
+        </button>
         <h1 className="font-bold text-white text-xl">
           Hello👋
           {data ? (
@@ -58,18 +83,23 @@ const Post = () => {
             name="content"
             id="text"
             onChange={Inserdata}
+            value={show.content}
             className="border rounded w-[30rem] h-[10rem] p-2 text-white"
             placeholder="What's on your mind ?"
           ></textarea>
           <input
             type="submit"
+            onClick={Rerendered}
             value="Create Post"
             className="border-blue-500 rounded pr-[8px] pl-[8px] bg-blue-500 text-white mt-[2px] block hover:cursor-pointer"
           />
         </form>
-        {data ? (
-          <div className="flex gap-10 flex-wrap">
-            <div className="border text-white rounded p-[10px] mt-6 mb-6 max-w-[30rem] min-w-[30rem] min-h-[10rem] break-all text-pretty">
+        <div className="flex flex-wrap gap-5 w-full ">
+          {data?.user.post?.map((post, index) => (
+            <div
+              key={index}
+              className="border text-white rounded p-[10px] mt-6 mb-6 max-w-[30rem] min-w-[30rem] min-h-[10rem] break-all text-pretty"
+            >
               <span className="text-white">
                 {data ? (
                   <p className="text-white">@{data.user.username}</p>
@@ -77,18 +107,14 @@ const Post = () => {
                   <p className="text-white">Loading...</p>
                 )}
               </span>
-
-              {data?.user.post?.map((post) => post.content)}
-
+              {post.content}
               <div className="flex gap-5">
                 <p className="hover:cursor-pointer">Like</p>
                 <p className="text-gray-300 hover:cursor-pointer">Edit</p>
               </div>
             </div>
-          </div>
-        ) : (
-          <p className="text-white">No posts yet.</p>
-        )}
+          ))}
+        </div>
       </div>
     </>
   );
