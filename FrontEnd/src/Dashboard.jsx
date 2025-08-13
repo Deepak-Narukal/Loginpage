@@ -1,12 +1,14 @@
 // /* eslint-disable no-unused-vars */
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Post = () => {
   const [show, setshow] = useState({ content: "" });
   const [data, setdata] = useState();
   const [rerender, setrerender] = useState();
+  const navigate = useNavigate();
 
   const Rerendered = (e) => {
     setrerender(e);
@@ -48,9 +50,18 @@ const Post = () => {
 
   const Logout = async () => {
     try {
-      await axios.post("http://localhost:3000/logout", {
-        withCredentials: true,
-      });
+      const remove = await axios.post(
+        "http://localhost:3000/logout",
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (remove.status === 200) {
+        navigate("/");
+        console.log("Logout successful");
+      }
     } catch (error) {
       console.error(error.message);
     }

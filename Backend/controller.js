@@ -113,16 +113,18 @@ const AuthVerify = async (req, res, next) => {
 }
 const Logout = async (req, res) => {
      try {
-          const { username } = req.user
-          const data = await data.findOne({ username })
-          if (!data) res.status(404).json({ message: "No User Found!" })
-          res.cookie("token", "", {
+          const remove = res.clearCookie("token", {
                httpOnly: true,
                secure: false,
                sameSite: "lax",
                path: "/"
 
           })
+          if (remove) {
+               return res.status(200).json({ message: "Logout successful" })
+          } else {
+               return res.status(500).json({ message: "Logout failed" })
+          }
      } catch (error) {
           res.status(500).json({
                message: error.message
